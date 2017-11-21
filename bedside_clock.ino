@@ -10,6 +10,8 @@ Bedside clock using NodeMCU to obtain time from NTP server, and display on multi
 
 ESP8266WebServer server(80);        // Instantiate server at port 80
 
+String page = "";
+
 void setup()
 {
   // put your setup code here, to run once:
@@ -23,6 +25,8 @@ void setup()
   //first parameter is name of access point, second is the password
   wifiManager.autoConnect("CLOCK", "PASSWORD");
   //wifiManager.startConfigPortal ("DK-AP");
+
+  CreateWebPage();
 }
 
 void configModeCallback(WiFiManager *myWiFiManager)
@@ -33,8 +37,28 @@ void configModeCallback(WiFiManager *myWiFiManager)
   Serial.println(myWiFiManager->getConfigPortalSSID());
 }
 
+/**
+ * Build the webpage and put to server
+ * */
+void CreateWebPage (void)
+{
+  Serial.println("Creating page");
+
+  page = "<H1>Bedside clock configuration</H1>";
+
+  server.on("/", [](){
+    server.send(200, "text/html", page);
+  });
+
+  server.on("/Timezone", [](){
+    server.send(200, "text/html", page);
+  });
+
+  server.begin();
+}
+
 void loop()
 {
-  // put your main code here, to run repeatedly:
-
+  // Wait for connections
+  server.handleClient();
 }
